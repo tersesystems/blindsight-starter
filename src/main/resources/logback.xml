@@ -1,0 +1,53 @@
+<configuration>
+
+    <!-- loosen rule to include for encoders as well as just top level -->
+    <newRule pattern="*/include"
+             actionClass="ch.qos.logback.core.joran.action.IncludeAction"/>
+
+    <!-- loosen the rule on appender refs so appenders can reference them -->
+    <newRule pattern="*/appender/appender-ref"
+             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
+
+    <!-- give the async appenders time to shutdown -->
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
+        <delay>100</delay>
+    </shutdownHook>
+
+    <conversionRule conversionWord="nanoTime" converterClass="com.tersesystems.logback.classic.NanoTimeConverter" />
+    <conversionRule conversionWord="uniqueId" converterClass="com.tersesystems.logback.uniqueid.UniqueIdConverter" />
+    <conversionRule conversionWord="tse" converterClass="com.tersesystems.logback.classic.TimeSinceEpochConverter" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%uniqueId %date{H:mm:ss.SSS} [%highlight(%-5level)] %logger{15} -  %message%ex%n</pattern>
+        </encoder>
+        <withJansi>true</withJansi>
+    </appender>
+
+    <appender name="ASYNCJSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender class="ch.qos.logback.core.FileAppender">
+            <file>logs/application.ndjson</file>
+            <include resource="json-encoder.xml"/>
+        </appender>
+    </appender>
+
+    <appender name="BLACKLITE" class="com.tersesystems.blacklite.logback.BlackliteAppender">
+        <file>logs/blacklite.db</file>
+        <include resource="json-encoder.xml"/>
+    </appender>
+
+    <!-- Use conditional logging in your application -->
+    <logger name="example" level="ALL"/>
+
+    <!-- Libraries should use INFO generally -->
+    <root level="INFO">
+        <appender class="com.tersesystems.logback.uniqueid.UniqueIdComponentAppender">
+            <appender class="com.tersesystems.logback.classic.NanoTimeComponentAppender">
+                <appender-ref ref="CONSOLE"/>
+                <appender-ref ref="BLACKLITE"/>
+                <appender-ref ref="ASYNCJSON"/>
+            </appender>
+        </appender>
+    </root>
+
+</configuration>

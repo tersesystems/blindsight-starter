@@ -1,0 +1,29 @@
+<included>
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+        <providers>
+            <pattern>
+                <pattern>
+                    {
+                    "id": "%uniqueId",
+                    "relative_ns": "#asLong{%nanoTime}",
+                    "tse_ms": "#asLong{%tse}"
+                    }
+                </pattern>
+            </pattern>
+            <timestamp>
+                <timeZone>UTC</timeZone>
+            </timestamp>
+            <version/>
+            <message/>
+            <loggerName/>
+            <threadName/>
+            <logLevel/>
+            <logLevelValue/><!-- numeric value is useful for filtering >= -->
+            <stackHash/>
+            <mdc/>
+            <logstashMarkers/>
+            <arguments/>
+            <stackTrace/>
+        </providers>
+    </encoder>
+</included>

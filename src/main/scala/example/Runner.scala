@@ -7,12 +7,12 @@ import com.tersesystems.blindsight.{Argument, Condition, Logger, LoggerFactory, 
 object Runner {
 
   def main(args: Array[String]): Unit = {
-    //new SLF4JExample().run()
-    new SimpleExample().run()
-    new ConditionalExample().run()
-    new ContextualExample().run()
-    new IntentionsExample().run()
-    new ScriptExample().run()
+    new SLF4JExample().run()
+    //new SimpleExample().run()
+    //new ConditionalExample().run()
+    //new ContextualExample().run()
+    //new IntentionsExample().run()
+    //new ScriptExample().run()
 
     stopLogback()
   }
@@ -21,6 +21,14 @@ object Runner {
     private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
     def run(): Unit = {
       logger.debug("SLF4J API statement")
+    }
+  }
+
+  case class Person(name: String, age: Int)
+  object Person {
+    implicit val personToArgument: ToArgument[Person] = ToArgument { person =>
+      import com.tersesystems.blindsight.DSL._
+      Argument(("name" -> person.name) ~ ("age" -> person.age))
     }
   }
 
@@ -37,13 +45,6 @@ object Runner {
       logger.info("Arguments are both logfmt and JSON {}", Person("will", 12))
     }
 
-    case class Person(name: String, age: Int)
-    object Person {
-      implicit val personToArgument: ToArgument[Person] = ToArgument { person =>
-        import com.tersesystems.blindsight.DSL._
-        Argument(("name" -> person.name) ~ ("age" -> person.age))
-      }
-    }
   }
 
   class ConditionalExample extends Runnable {

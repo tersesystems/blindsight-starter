@@ -14,15 +14,19 @@ object Dependencies {
   val janino = "org.codehaus.janino" % "janino" % "3.0.11"
   val jansi  = "org.fusesource.jansi" % "jansi" % "1.17.1"
 
-  // SQLite appender
+  // https://github.com/tersesystems/blacklite#logback
   val blackliteLogback = "com.tersesystems.blacklite" % "blacklite-logback" % blacklite
+  // https://github.com/tersesystems/blacklite#codec
+  //val blackliteZtdCodec = "com.tersesystems.blacklite" % "blacklite-codec-zstd" % blacklite
 
-  // terse-logback utilties
+  // https://tersesystems.github.io/terse-logback/
   val terseLogbackClassic = "com.tersesystems.logback" % "logback-classic" % terseLogback
   val logbackUniqueId = "com.tersesystems.logback" % "logback-uniqueid-appender" % terseLogback
 
-  // blindsight API and integration with logstash-logback-encoder
+  // https://tersesystems.github.io/blindsight/setup/index.html
   val blindsightLogstash = "com.tersesystems.blindsight" %% "blindsight-logstash" % blindsight
+  // https://tersesystems.github.io/blindsight/usage/inspections.html
   val blindsightInspection = "com.tersesystems.blindsight" %% "blindsight-inspection" % blindsight
+  // https://tersesystems.github.io/blindsight/usage/scripting.html
   val blindsightScripting = "com.tersesystems.blindsight" %% "blindsight-scripting" % blindsight
 }

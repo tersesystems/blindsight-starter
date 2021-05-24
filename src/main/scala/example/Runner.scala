@@ -7,12 +7,13 @@ import com.tersesystems.blindsight.{Argument, Condition, Logger, LoggerFactory, 
 object Runner {
 
   def main(args: Array[String]): Unit = {
-    new SLF4JExample().run()
+    //new SLF4JExample().run()
     //new SimpleExample().run()
     //new ConditionalExample().run()
     //new ContextualExample().run()
     //new IntentionsExample().run()
     //new ScriptExample().run()
+    new FlowExample().run()
 
     stopLogback()
   }
@@ -45,6 +46,21 @@ object Runner {
       logger.info("Arguments are both logfmt and JSON {}", Person("will", 12))
     }
 
+  }
+
+  class FlowExample extends Runnable {
+    import com.tersesystems.blindsight.flow._
+
+    private val logger: Logger = LoggerFactory.getLogger
+    implicit def flowBehavior[B: ToArgument]: FlowBehavior[B] = new XLoggerFlowBehavior()
+
+    def run(): Unit = {
+      val result = flowMethod(1, 1)
+    }
+
+    def flowMethod(arg1: Int, arg2: Int): Int = logger.flow.info {
+        arg1 + arg2
+      }
   }
 
   class ConditionalExample extends Runnable {

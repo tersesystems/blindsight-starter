@@ -1,6 +1,6 @@
 # Blindsight Starter
 
-This is a simple Scala project that shows how you can configure a project fo r structured logging and Blacklite, and provides a brief demonstration of using the API.
+This is a simple Scala project that shows how you can configure a project for structured logging and Blacklite, and provides a brief demonstration of using the API.
 
 Please see documentation for details:
 

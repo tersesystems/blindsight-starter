@@ -1,12 +1,12 @@
 package example
 
-import com.tersesystems.blindsight.scripting.{ScriptBasedLocation, ScriptHandle, ScriptManager}
-import com.tersesystems.blindsight.{Argument, Condition, Logger, LoggerFactory, ToArgument, bobj}
+// Always import the following for ease of use :-)
+import com.tersesystems.blindsight._
+import com.tersesystems.blindsight.DSL._
 
 object Runner {
-   
-  def main(args: Array[String]): Unit = {       
-    startLogback()
+  def main(args: Array[String]): Unit = {
+    startLogback()  
 
     // Demonstrate that JUL and SLF4J go to same logging outputs
     new JULExample().run()
@@ -23,9 +23,16 @@ object Runner {
   }
 
   class JULExample extends Runnable {
+    import com.tersesystems.logback.classic._
+
     private val logger = java.util.logging.Logger.getLogger(getClass.getName)
     def run(): Unit = {
       logger.info("JUL statement")
+      // you wouldn't see this ordinarily, but can use ChangeLogLevel to turn it on
+      // and the LevelChangePropagator will handle it (do not use jul.Logger.setLevel)
+      val changer = new ChangeLogLevel()
+      changer.changeLogLevel(getClass.getName, "DEBUG")
+      logger.log(java.util.logging.Level.FINE, "FINE JUL statement")
     }
   }
 
@@ -39,7 +46,6 @@ object Runner {
   case class Person(name: String, age: Int)
   object Person {
     implicit val personToArgument: ToArgument[Person] = ToArgument { person =>
-      import com.tersesystems.blindsight.DSL._
       Argument(("name" -> person.name) ~ ("age" -> person.age))
     }
   }
@@ -114,6 +120,8 @@ object Runner {
   }
 
   class ScriptExample extends Runnable {
+    import com.tersesystems.blindsight.scripting._
+
     def run(): Unit = {
       val scriptHandle = new ScriptHandle {
         override def isInvalid: Boolean = false
@@ -139,24 +147,26 @@ object Runner {
     }
   }
 
-  def loggerContext = {   
+  private def loggerContext = {
     import ch.qos.logback.classic.LoggerContext 
     org.slf4j.LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
   }
 
   // startLogback should run in main class static block or as first statement
-  // in main() method    
+  // in main() method, easiest to do here rather than explaining it in logback.xml
   def startLogback() {
-    // logging.properties doesn't work reliably in sbt
+    // logging.properties doesn't work reliably in sbt, easier to explicitly handle it
+    // https://mkyong.com/logging/how-to-load-logging-properties-for-java-util-logging/
     // http://www.slf4j.org/api/org/slf4j/bridge/SLF4JBridgeHandler.html
     import org.slf4j.bridge.SLF4JBridgeHandler
     import ch.qos.logback.classic.jul.LevelChangePropagator
     SLF4JBridgeHandler.removeHandlersForRootLogger()
     SLF4JBridgeHandler.install()
 
-		val levelChangePropagator = new LevelChangePropagator();
-		levelChangePropagator.setResetJUL(true);
-		levelChangePropagator.setContext(loggerContext);
+		val levelChangePropagator = new LevelChangePropagator()
+		levelChangePropagator.setResetJUL(true)
+		levelChangePropagator.setContext(loggerContext)
+    loggerContext.addListener(levelChangePropagator)
   }
 
   def stopLogback(): Unit = {

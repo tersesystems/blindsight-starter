@@ -1,5 +1,5 @@
 <configuration>
-
+    
     <!-- loosen rule to include for encoders as well as just top level -->
     <newRule pattern="*/include"
              actionClass="ch.qos.logback.core.joran.action.IncludeAction"/>

@@ -9,16 +9,19 @@ lazy val root = (project in file("."))
   .settings(
     name := "blindsight-starter",
 
+    // internal jdk libraries use java util logging
+    libraryDependencies += julToSlf4j,
+
     // Basic logback
     libraryDependencies += logbackClassic,
     libraryDependencies += logstashLogbackEncoder,
     libraryDependencies += janino,
     libraryDependencies += jansi,
-
+    
     // sqlite appender
     libraryDependencies += blackliteLogback,
 
-    //    // terse-logback utilities
+    // terse-logback utilities
     libraryDependencies += terseLogbackClassic,
     libraryDependencies += logbackUniqueId,
 

@@ -1,21 +1,32 @@
 package example
 
-import ch.qos.logback.classic.LoggerContext
 import com.tersesystems.blindsight.scripting.{ScriptBasedLocation, ScriptHandle, ScriptManager}
 import com.tersesystems.blindsight.{Argument, Condition, Logger, LoggerFactory, ToArgument, bobj}
 
 object Runner {
+   
+  def main(args: Array[String]): Unit = {       
+    startLogback()
 
-  def main(args: Array[String]): Unit = {
-    //new SLF4JExample().run()
+    // Demonstrate that JUL and SLF4J go to same logging outputs
+    new JULExample().run()
+    new SLF4JExample().run()
+    
     //new SimpleExample().run()
     //new ConditionalExample().run()
     //new ContextualExample().run()
     //new IntentionsExample().run()
     //new ScriptExample().run()
-    new FlowExample().run()
-
+    //new FlowExample().run()
+    
     stopLogback()
+  }
+
+  class JULExample extends Runnable {
+    private val logger = java.util.logging.Logger.getLogger(getClass.getName)
+    def run(): Unit = {
+      logger.info("JUL statement")
+    }
   }
 
   class SLF4JExample extends Runnable {
@@ -128,9 +139,30 @@ object Runner {
     }
   }
 
+  def loggerContext = {   
+    import ch.qos.logback.classic.LoggerContext 
+    org.slf4j.LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+  }
+
+  // startLogback should run in main class static block or as first statement
+  // in main() method    
+  def startLogback() {
+    // logging.properties doesn't work reliably in sbt
+    // http://www.slf4j.org/api/org/slf4j/bridge/SLF4JBridgeHandler.html
+    import org.slf4j.bridge.SLF4JBridgeHandler
+    import ch.qos.logback.classic.jul.LevelChangePropagator
+    SLF4JBridgeHandler.removeHandlersForRootLogger()
+    SLF4JBridgeHandler.install()
+
+		val levelChangePropagator = new LevelChangePropagator();
+		levelChangePropagator.setResetJUL(true);
+		levelChangePropagator.setContext(loggerContext);
+  }
+
   def stopLogback(): Unit = {
+    // ideally stop explicitly for async loggers (there is also a shutdown hook just in case)
     // http://logback.qos.ch/manual/configuration.html#stopContext
-    org.slf4j.LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext].stop()
+    loggerContext.stop()
   }
 
 }

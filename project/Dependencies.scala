@@ -13,6 +13,7 @@ object Dependencies {
   val logstashLogbackEncoder = "net.logstash.logback" % "logstash-logback-encoder" % "6.6"
   val janino = "org.codehaus.janino" % "janino" % "3.0.11"
   val jansi  = "org.fusesource.jansi" % "jansi" % "1.17.1"
+  val julToSlf4j = "org.slf4j" % "jul-to-slf4j" % "1.7.30"
 
   // https://github.com/tersesystems/blacklite#logback
   val blackliteLogback = "com.tersesystems.blacklite" % "blacklite-logback" % blacklite

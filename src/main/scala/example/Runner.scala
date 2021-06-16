@@ -12,7 +12,7 @@ object Runner {
     new JULExample().run()
     new SLF4JExample().run()
     
-    //new SimpleExample().run()
+    new SimpleExample().run()
     //new ConditionalExample().run()
     //new ContextualExample().run()
     //new IntentionsExample().run()

@@ -152,12 +152,35 @@ object Runner {
     org.slf4j.LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
   }
 
-  // startLogback should run in main class static block or as first statement
-  // in main() method, easiest to do here rather than explaining it in logback.xml
   def startLogback() {
-    // logging.properties doesn't work reliably in sbt, easier to explicitly handle it
-    // https://mkyong.com/logging/how-to-load-logging-properties-for-java-util-logging/
-    // http://www.slf4j.org/api/org/slf4j/bridge/SLF4JBridgeHandler.html
+    // There is no reliable way to run a JUL to SLF4J bridge without writing
+    // some code or setting a system property.
+    // 
+    // JUL's LogManager has two system properties:
+    //
+    // - java.util.logging.config.class
+    // - java.util.logging.config.file
+    //
+    // and if it doesn't find either, then it looks in `${java.home}/conf/logging.properties`
+    // if you're on JDK 11.  There's no way to configure it from classpath.
+    //
+    // Check out https://github.com/AdoptOpenJDK/openjdk-jdk/blob/master/src/java.logging/share/classes/java/util/logging/LogManager.java#L1347
+    // 
+    // Because various libraries such as Guice and GRPC use java.util.logging
+    // instead of SLF4J, this means in order to capture logs from those frameworks
+    // you must ensure that the SLF4J bridge handler is installed ASAP.
+    //
+    // Ideally, you should fold this code into some trait that your main class
+    // extends and call `startLogback` in a static block.
+    //
+    // Otherwise, you can put this code into a class which is referenced by
+    // `java.util.logging.config.class` system property.
+    //
+    // The final option, of setting SLF4JBridgeHandler in a `logging.properties` file,
+    // is not recommended as you still have to set the level change propagator,
+    // and you may as well do that here rather than in `logback.xml`.  You should
+    // not try to run JUL logging without LevelChangePropagator.
+    
     import org.slf4j.bridge.SLF4JBridgeHandler
     import ch.qos.logback.classic.jul.LevelChangePropagator
     SLF4JBridgeHandler.removeHandlersForRootLogger()

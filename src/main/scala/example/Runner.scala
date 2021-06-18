@@ -186,9 +186,9 @@ object Runner {
     SLF4JBridgeHandler.removeHandlersForRootLogger()
     SLF4JBridgeHandler.install()
 
-		val levelChangePropagator = new LevelChangePropagator()
-		levelChangePropagator.setResetJUL(true)
-		levelChangePropagator.setContext(loggerContext)
+    val levelChangePropagator = new LevelChangePropagator()
+    levelChangePropagator.setResetJUL(true)
+    levelChangePropagator.setContext(loggerContext)
     loggerContext.addListener(levelChangePropagator)
   }
 

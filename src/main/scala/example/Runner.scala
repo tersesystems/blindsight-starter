@@ -152,21 +152,10 @@ object Runner {
     org.slf4j.LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
   }
 
-  // startLogback should run in main class static block or as first statement
-  // in main() method, easiest to do here rather than explaining it in logback.xml
   def startLogback() {
-    // logging.properties doesn't work reliably in sbt, easier to explicitly handle it
-    // https://mkyong.com/logging/how-to-load-logging-properties-for-java-util-logging/
-    // http://www.slf4j.org/api/org/slf4j/bridge/SLF4JBridgeHandler.html
-    import org.slf4j.bridge.SLF4JBridgeHandler
-    import ch.qos.logback.classic.jul.LevelChangePropagator
-    SLF4JBridgeHandler.removeHandlersForRootLogger()
-    SLF4JBridgeHandler.install()
-
-		val levelChangePropagator = new LevelChangePropagator()
-		levelChangePropagator.setResetJUL(true)
-		levelChangePropagator.setContext(loggerContext)
-    loggerContext.addListener(levelChangePropagator)
+    // startLogback should run in main class static block or as first statement
+    // you need this to ensure you initialize Logback **before** JUL logging.
+    loggerContext
   }
 
   def stopLogback(): Unit = {

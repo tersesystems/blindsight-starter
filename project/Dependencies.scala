@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   val blindsight = "1.5.1"
-  val terseLogback = "0.16.2"
+  val terseLogback = "1.0.0"
   val blacklite = "1.0.1"
 
   val scalaTest = "org.scalatest" %% "scalatest" % "3.2.8"

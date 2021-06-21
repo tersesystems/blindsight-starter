@@ -1,5 +1,8 @@
 <configuration>
-    
+    <!-- set up the rule -->
+    <newRule pattern="configuration/slf4jBridgeHandler"
+             actionClass="com.tersesystems.logback.classic.SLF4JBridgeHandlerAction"/>
+
     <!-- loosen rule to include for encoders as well as just top level -->
     <newRule pattern="*/include"
              actionClass="ch.qos.logback.core.joran.action.IncludeAction"/>
@@ -12,6 +15,14 @@
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
         <delay>100</delay>
     </shutdownHook>
+
+    <!-- calls removeHandlersForRootLogger / install -->
+    <slf4jBridgeHandler/>
+
+    <!-- reset all previous level configurations of all j.u.l. loggers -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
 
     <conversionRule conversionWord="nanoTime" converterClass="com.tersesystems.logback.classic.NanoTimeConverter" />
     <conversionRule conversionWord="uniqueId" converterClass="com.tersesystems.logback.uniqueid.UniqueIdConverter" />

@@ -1,6 +1,5 @@
 <included>
     <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-        <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
         <providers>
             <pattern>
                 <pattern>

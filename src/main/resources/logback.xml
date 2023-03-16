@@ -1,59 +1,46 @@
 <configuration>
-    <!-- set up the rule -->
-    <newRule pattern="configuration/slf4jBridgeHandler"
-             actionClass="com.tersesystems.logback.classic.SLF4JBridgeHandlerAction"/>
-
-    <!-- loosen rule to include for encoders as well as just top level -->
-    <newRule pattern="*/include"
-             actionClass="ch.qos.logback.core.joran.action.IncludeAction"/>
-
-    <!-- loosen the rule on appender refs so appenders can reference them -->
-    <newRule pattern="*/appender/appender-ref"
-             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
-
-    <!-- give the async appenders time to shutdown -->
-    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
-        <delay>100</delay>
-    </shutdownHook>
-
-    <!-- calls removeHandlersForRootLogger / install -->
-    <slf4jBridgeHandler/>
-
-    <!-- reset all previous level configurations of all j.u.l. loggers -->
-    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
-        <resetJUL>true</resetJUL>
-    </contextListener>
 
     <conversionRule conversionWord="nanoTime" converterClass="com.tersesystems.logback.classic.NanoTimeConverter" />
     <conversionRule conversionWord="uniqueId" converterClass="com.tersesystems.logback.uniqueid.UniqueIdConverter" />
     <conversionRule conversionWord="tse" converterClass="com.tersesystems.logback.classic.TimeSinceEpochConverter" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- may want to filter on developer console -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
-        </filter>
         <encoder>
             <pattern>%uniqueId %date{H:mm:ss.SSS} [%highlight(%-5level)] %logger{15} -  %message%ex%n</pattern>
         </encoder>
         <withJansi>true</withJansi>
     </appender>
 
-    <appender name="ASYNCJSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-        <!-- don't show debug or trace logs in operational logging -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-        <appender class="ch.qos.logback.core.FileAppender">
-            <file>logs/application.ndjson</file>
-            <include resource="json-encoder.xml"/>
-        </appender>
-    </appender>
-
-    <appender name="BLACKLITE" class="com.tersesystems.blacklite.logback.BlackliteAppender">
-        <!-- local database store gets everything -->
-        <file>logs/blacklite.db</file>
-        <include resource="json-encoder.xml"/>
+    <appender name="JSON" class="ch.qos.logback.core.FileAppender">
+        <file>logs/application.ndjson</file>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                        "id": "%uniqueId",
+                        "relative_ns": "#asLong{%nanoTime}",
+                        "tse_ms": "#asLong{%tse}"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <version/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <logLevelValue/><!-- numeric value is useful for filtering >= -->
+                <stackHash/>
+                <mdc/>
+                <logstashMarkers/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
+        </encoder>
     </appender>
 
     <!-- Use conditional logging in your application -->
@@ -61,13 +48,8 @@
 
     <!-- Libraries should use INFO generally -->
     <root level="INFO">
-        <appender class="com.tersesystems.logback.uniqueid.UniqueIdComponentAppender">
-            <appender class="com.tersesystems.logback.classic.NanoTimeComponentAppender">
-                <appender-ref ref="CONSOLE"/>
-                <appender-ref ref="BLACKLITE"/>
-                <appender-ref ref="ASYNCJSON"/>
-            </appender>
-        </appender>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JSON"/>
     </root>
 
 </configuration>
